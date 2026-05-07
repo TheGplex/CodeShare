@@ -6,12 +6,14 @@ import { formatRelative } from "@/lib/utils";
 import { languageLabel } from "@/lib/language";
 
 export type SnippetCardData = {
+  id?: string;
   shortId: string;
   title: string;
   description?: string | null;
   language?: string | null;
   visibility: "PUBLIC" | "UNLISTED" | "PRIVATE";
   views: number;
+  createdAt?: string | Date;
   updatedAt: string | Date;
   user?: { username: string; avatarUrl?: string | null };
   _count?: { files: number };
