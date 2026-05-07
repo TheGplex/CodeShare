@@ -33,7 +33,9 @@ export async function GET(_req: Request, { params }: Params) {
   const zip = new JSZip();
   for (const f of snippet.files) zip.file(f.filename, f.content);
   const buf = await zip.generateAsync({ type: "uint8array" });
-  return new Response(new Blob([buf]), {
+  // Cast: TS lib types make Uint8Array<ArrayBufferLike> not assignable to BlobPart
+  // (because the buffer could in theory be a SharedArrayBuffer). Here it isn't.
+  return new Response(buf as unknown as BodyInit, {
     status: 200,
     headers: {
       "content-type": "application/zip",
