@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { SnippetCreate, MAX_TOTAL_BYTES, totalBytes } from "@/lib/snippet";
 import { newShortId } from "@/lib/short-id";
 import { detectLanguage } from "@/lib/language";
@@ -96,7 +97,7 @@ export async function GET(req: Request) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const where: Parameters<typeof prisma.snippet.findMany>[0]["where"] = {
+    const where: Prisma.SnippetWhereInput = {
       userId: session.user.id,
     };
     if (q) where.title = { contains: q, mode: "insensitive" };
@@ -121,7 +122,7 @@ export async function GET(req: Request) {
   }
 
   // Discover (public)
-  const where: Parameters<typeof prisma.snippet.findMany>[0]["where"] = {
+  const where: Prisma.SnippetWhereInput = {
     visibility: "PUBLIC",
   };
   if (q) where.title = { contains: q, mode: "insensitive" };
