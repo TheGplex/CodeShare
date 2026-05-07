@@ -33,7 +33,7 @@ export async function GET(_req: Request, { params }: Params) {
   const zip = new JSZip();
   for (const f of snippet.files) zip.file(f.filename, f.content);
   const buf = await zip.generateAsync({ type: "uint8array" });
-  return new Response(buf, {
+  return new Response(new Blob([buf]), {
     status: 200,
     headers: {
       "content-type": "application/zip",
