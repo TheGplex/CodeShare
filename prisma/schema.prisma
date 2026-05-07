@@ -1,0 +1,113 @@
+// Prisma schema for codeshare
+// See https://www.prisma.io/docs
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Visibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  // Optional in DB so the NextAuth adapter can create OAuth users;
+  // we always populate it via the createUser event / register endpoint.
+  username      String?   @unique
+  passwordHash  String?
+  name          String?
+  avatarUrl     String?
+  bio           String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  snippets Snippet[]
+
+  @@index([username])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Snippet {
+  id          String     @id @default(cuid())
+  shortId     String     @unique
+  userId      String
+  title       String
+  description String?
+  language    String?
+  visibility  Visibility @default(PRIVATE)
+  forkOfId    String?
+  views       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files   File[]
+  forkOf  Snippet?  @relation("Forks", fields: [forkOfId], references: [id], onDelete: SetNull)
+  forks   Snippet[] @relation("Forks")
+
+  @@index([userId])
+  @@index([visibility, createdAt(sort: Desc)])
+  @@index([shortId])
+}
+
+model File {
+  id        String   @id @default(cuid())
+  snippetId String
+  filename  String
+  content   String   @db.Text
+  language  String?
+  size      Int      @default(0)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  snippet Snippet @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+
+  @@unique([snippetId, filename])
+  @@index([snippetId])
+}
