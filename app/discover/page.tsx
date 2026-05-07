@@ -37,6 +37,7 @@ export default async function Discover() {
         scope="discover"
         initialItems={items.map((s) => ({
           ...s,
+          user: { ...s.user, username: s.user.username ?? "anonymous" },
           createdAt: s.createdAt.toISOString(),
           updatedAt: s.updatedAt.toISOString(),
         }))}
