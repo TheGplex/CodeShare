@@ -26,6 +26,9 @@ export default async function ProfilePage({
   });
   if (!user) notFound();
 
+  // We looked the user up by username, so it cannot actually be null here —
+  // TS only sees `string | null` because the column is nullable in the schema.
+  const username = user.username ?? params.username;
   const isSelf = session?.user?.id === user.id;
   const snippets = await prisma.snippet.findMany({
     where: {
@@ -56,18 +59,18 @@ export default async function ProfilePage({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={user.avatarUrl}
-              alt={user.username}
+              alt={username}
               className="h-full w-full rounded-full object-cover"
             />
           ) : (
-            user.username[0].toUpperCase()
+            username[0].toUpperCase()
           )}
         </div>
         <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight truncate">
-            {user.name ?? user.username}
+            {user.name ?? username}
           </h1>
-          <p className="text-fg-muted">@{user.username}</p>
+          <p className="text-fg-muted">@{username}</p>
           {user.bio ? (
             <p className="mt-2 text-sm text-fg-muted">{user.bio}</p>
           ) : null}
