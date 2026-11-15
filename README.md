@@ -1,6 +1,8 @@
-# codeshare
+# CodeShare
 
 A private, self-hosted code-sharing platform — share snippets with public, unlisted, or private visibility. Built to run comfortably on a Raspberry Pi 5.
+
+> An earlier experiment of mine. The idea, testing, adjustments and documentation are mine; most of the code was written with AI assistance.
 
 - **Frontend:** Next.js 14 (App Router) · TypeScript · Tailwind · custom dark UI
 - **Backend:** Next.js API routes · NextAuth.js · Prisma · PostgreSQL
@@ -22,7 +24,7 @@ A private, self-hosted code-sharing platform — share snippets with public, unl
 - Profile pages with public snippets
 - Copy, raw, download (single file or zip), fork
 - Owner check on every read/write of private content
-- Rate limiting on auth & create endpoints
+- Rate limiting on registration & snippet creation
 - bcrypt password hashing
 - CSRF via NextAuth · sanitized rendering
 
